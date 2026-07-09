@@ -1,27 +1,31 @@
-// Captures the original Error out-of-band so server.ts can recover the stack
-// when h3 has already swallowed the throw into a generic 500 Response.
+let lastCapturedError: unknown = undefined;
 
-let lastCapturedError: { error: unknown; at: number } | undefined;
-const TTL_MS = 5_000;
-
-function record(error: unknown) {
-  lastCapturedError = { error, at: Date.now() };
+function capture(error: unknown) {
+  lastCapturedError = error;
 }
 
-if (typeof globalThis.addEventListener === "function") {
-  globalThis.addEventListener("error", (event) => record((event as ErrorEvent).error ?? event));
-  globalThis.addEventListener("unhandledrejection", (event) =>
-    record((event as PromiseRejectionEvent).reason),
-  );
+if (typeof globalThis !== "undefined") {
+  const g = globalThis as unknown as {
+    addEventListener?: (t: string, cb: (e: unknown) => void) => void;
+  };
+  if (typeof g.addEventListener === "function") {
+    try {
+      g.addEventListener("error", (event: unknown) => {
+        const err = (event as { error?: unknown; message?: unknown })?.error ?? (event as { message?: unknown })?.message;
+        if (err !== undefined) capture(err);
+      });
+      g.addEventListener("unhandledrejection", (event: unknown) => {
+        const reason = (event as { reason?: unknown })?.reason;
+        if (reason !== undefined) capture(reason);
+      });
+    } catch {
+      // ignore — some runtimes reject unknown events
+    }
+  }
 }
 
 export function consumeLastCapturedError(): unknown {
-  if (!lastCapturedError) return undefined;
-  if (Date.now() - lastCapturedError.at > TTL_MS) {
-    lastCapturedError = undefined;
-    return undefined;
-  }
-  const { error } = lastCapturedError;
+  const e = lastCapturedError;
   lastCapturedError = undefined;
-  return error;
+  return e;
 }
