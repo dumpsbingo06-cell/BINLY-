@@ -26,16 +26,7 @@ export function SiteFooter() {
             </p>
           </div>
         </div>
-        <div className="flex items-center justify-between gap-4 sm:justify-end">
-          <nav className="flex items-center gap-4 text-sm text-muted-foreground" aria-label="Footer">
-            <Link to="/" className="transition-colors hover:text-primary">
-              Lookup
-            </Link>
-            <Link to="/contact" className="transition-colors hover:text-primary">
-              Contact
-            </Link>
-          </nav>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:justify-end">
           {s.telegram_url && (
             <a
               href={s.telegram_url}
@@ -58,10 +49,6 @@ export function SiteFooter() {
               <MessageCircle className="h-4 w-4" />
             </a>
           )}
-          <Link to="/contact" aria-label="Contact us" title="Contact us" className={iconCls}>
-            <Mail className="h-4 w-4" />
-          </Link>
-          </div>
         </div>
       </div>
     </footer>
