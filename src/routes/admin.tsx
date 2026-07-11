@@ -274,41 +274,61 @@ function AdminPage() {
             <p className="text-sm text-muted-foreground">No messages yet.</p>
           ) : (
             <ul className="space-y-3">
-              {messages.map((m) => (
-                <li key={m.id} className="rounded-lg border border-border/60 bg-background p-3">
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                          m.category === "advertisement"
-                            ? "bg-primary/15 text-primary"
-                            : "bg-secondary text-secondary-foreground"
-                        }`}
-                      >
-                        {m.category}
-                      </span>
-                      <span className="text-sm font-semibold">{m.name}</span>
-                      <a href={`mailto:${m.email}`} className="text-xs text-primary hover:underline">
-                        {m.email}
-                      </a>
+              {messages.map((m) => {
+                const hasEmail = m.email && m.email !== "anonymous@binly.local";
+                const mailto = hasEmail
+                  ? `mailto:${m.email}?subject=${encodeURIComponent("Re: " + m.name)}&body=${encodeURIComponent(`\n\n---\nOn ${new Date(m.created_at).toLocaleString()} you wrote:\n${m.message}`)}`
+                  : null;
+                return (
+                  <li key={m.id} className="rounded-lg border border-border/60 bg-background p-3">
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            m.category === "advertisement"
+                              ? "bg-primary/15 text-primary"
+                              : "bg-secondary text-secondary-foreground"
+                          }`}
+                        >
+                          {m.category}
+                        </span>
+                        <span className="text-sm font-semibold">{m.name}</span>
+                        {hasEmail ? (
+                          <a href={`mailto:${m.email}`} className="text-xs text-primary hover:underline">
+                            {m.email}
+                          </a>
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">no reply address</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <time className="text-[11px] text-muted-foreground">
+                          {new Date(m.created_at).toLocaleString()}
+                        </time>
+                        <button
+                          onClick={() => handleDeleteMessage(m.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                          aria-label="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <time className="text-[11px] text-muted-foreground">
-                        {new Date(m.created_at).toLocaleString()}
-                      </time>
-                      <button
-                        onClick={() => handleDeleteMessage(m.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                        aria-label="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="whitespace-pre-wrap text-sm text-foreground/90">{m.message}</p>
-                </li>
-              ))}
+                    <p className="whitespace-pre-wrap text-sm text-foreground/90">{m.message}</p>
+                    {mailto && (
+                      <div className="mt-2">
+                        <a href={mailto}>
+                          <Button size="sm" variant="outline" className="gap-2">
+                            <Mail className="h-3.5 w-3.5" /> Reply via email
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
+
           )}
         </section>
       </main>

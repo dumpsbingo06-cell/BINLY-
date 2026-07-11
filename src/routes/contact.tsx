@@ -18,6 +18,7 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const [subject, setSubject] = useState("");
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -28,9 +29,10 @@ function ContactPage() {
     setErr(null);
     setBusy(true);
     try {
-      await submitContactMessage({ subject, message });
+      await submitContactMessage({ subject, message, email });
       setDone(true);
       setSubject("");
+      setEmail("");
       setMessage("");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Failed to send");
@@ -38,6 +40,7 @@ function ContactPage() {
       setBusy(false);
     }
   }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,6 +70,10 @@ function ContactPage() {
               <Field label="Subject">
                 <Input value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={100} required />
               </Field>
+              <Field label="Your email (optional, for reply)">
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} placeholder="you@example.com" />
+              </Field>
+
               <Field label="Message">
                 <Textarea value={message} onChange={(e) => setMessage(e.target.value)} maxLength={2000} rows={6} required />
                 <p className="mt-1 text-right text-[11px] text-muted-foreground">{message.length}/2000</p>

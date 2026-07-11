@@ -42,9 +42,11 @@ export async function updateSiteSettings(input: SiteSettings): Promise<void> {
 export async function submitContactMessage(input: {
   subject: string;
   message: string;
+  email?: string;
 }): Promise<void> {
   const subject = String(input.subject ?? "").trim().slice(0, 100);
   const message = String(input.message ?? "").trim().slice(0, 2000);
+  const email = String(input.email ?? "").trim().slice(0, 200);
   if (!subject) throw new Error("Subject is required");
   if (!message) throw new Error("Message is required");
   const { error } = await supabase
@@ -52,11 +54,12 @@ export async function submitContactMessage(input: {
     .insert({
       category: "general",
       name: subject,
-      email: "anonymous@binly.local",
+      email: email || "anonymous@binly.local",
       message,
     });
   if (error) throw new Error(error.message);
 }
+
 
 
 export async function listContactMessages(): Promise<ContactMessage[]> {
