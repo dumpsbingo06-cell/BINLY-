@@ -13,10 +13,8 @@ export function SiteHeader() {
             <span className="font-display text-lg font-bold leading-tight tracking-tight text-foreground">
               Binly
             </span>
-            <span className="max-w-[16rem] text-[11px] leading-tight text-muted-foreground sm:max-w-xs">
-              Bank card intelligence with issuer, country, scheme and contact details.
-            </span>
           </span>
+
         </Link>
         <nav className="flex items-center gap-1 text-sm" aria-label="Primary">
           <Link
