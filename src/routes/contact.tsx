@@ -18,6 +18,7 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const [subject, setSubject] = useState("");
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -28,9 +29,10 @@ function ContactPage() {
     setErr(null);
     setBusy(true);
     try {
-      await submitContactMessage({ subject, message });
+      await submitContactMessage({ subject, message, email });
       setDone(true);
       setSubject("");
+      setEmail("");
       setMessage("");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Failed to send");
@@ -38,6 +40,7 @@ function ContactPage() {
       setBusy(false);
     }
   }
+
 
   return (
     <div className="min-h-screen bg-background">
